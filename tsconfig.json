@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    /* === Ціль компіляції === */
+    "target": "ES2017",                        /* Дозволяє сучасні можливості JS (find, includes, setPrototypeOf тощо). */
+    "lib": ["ES2017", "DOM"],                  /* Підтримка браузерного API (document, localStorage, window). */
+
+    /* === Модулі === */
+    "module": "ESNext",                        /* Використовує сучасний формат модулів (ESM) для Webpack. */
+    "moduleResolution": "node",                /* Сумісно з Webpack і node-імпортами. */
+
+    /* === Якість компіляції === */
+    "strict": true,                            /* Увімкнути сувору типізацію. */
+    "noImplicitAny": true,                     /* Заборонити неявний any. */
+    "strictNullChecks": true,                  /* Увімкнути перевірку null/undefined. */
+    "forceConsistentCasingInFileNames": true,  /* Заборонити відмінності у регістрі файлів. */
+    "skipLibCheck": true,                      /* Прискорює компіляцію (ігнорує внутрішні типи бібліотек). */
+
+    /* === Шляхи і вихідні дані === */
+    "outDir": "./dist",                        /* Каталог збірки після компіляції. */
+    "rootDir": "./src",                        /* Каталог вихідних .ts файлів. */
+    "sourceMap": true,                         /* Створює *.map для налагодження. */
+    "removeComments": true,                    /* Видаляє коментарі у зібраному JS. */
+    "esModuleInterop": true,                   /* Дозволяє імпорти типу import express from 'express'. */
+
+    /* === Інше === */
+    "resolveJsonModule": true,                 /* Дозволяє імпорт JSON-файлів. */
+    "allowSyntheticDefaultImports": true       /* Дозволяє використовувати імпорт без експорту за замовчуванням. */
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="uk">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="libs/bootstrap.css">
+        <link rel="shortcut icon" href="#">
+        <title>Система управління бібліотекою</title>
+    </head>
+    <body>
+        <!--Past your markup here-->
+        <div
+            class="bg-light d-flex flex-column align-items-center p-3 justify-content-between"
+        >
+            <h1 class="fw-bold mb-3">Система управління бібліотекою</h1>
+            <div class="container bg-white shadow p-3 rounded mb-4">
+                <form class="needs-validation" novalidate name="add-book">
+                    <h2 class="fw-bold my-3">Додати книгу</h2>
+                    <div class="mb-3">
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="book-name"
+                            placeholder="Назва книги"
+                            required
+                            tabindex="1"
+                        >
+                        <span class="invalid-feedback"
+                            >Це поле є обов'язковим!</span
+                        >
+                        <span class="valid-feedback">👍</span>
+                    </div>
+                    <div class="mb-3">
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="book-author"
+                            placeholder="Автор книги"
+                            required
+                            tabindex="2"
+                        >
+                        <span class="invalid-feedback"
+                            >Це поле є обов'язковим!</span
+                        >
+                        <span class="valid-feedback">👍</span>
+                    </div>
+                    <div class="mb-3">
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="release-year"
+                            id="release-year"
+                            placeholder="Рік видання"
+                            pattern="^\d{1,4}$"
+                            required
+                            tabindex="3"
+                        >
+                        <span class="invalid-feedback"
+                            >Це поле є обов'язковим!</span
+                        >
+                        <span class="valid-feedback">👍</span>
+                    </div>
+                    <button
+                        class="btn btn-success mb-3"
+                        type="submit"
+                        tabindex="4"
+                    >
+                        Додати книгу
+                    </button>
+                </form>
+            </div>
+            <div class="container bg-white shadow p-3 rounded mb-4">
+                <form class="needs-validation" novalidate name="add-user">
+                    <h2 class="fw-bold my-3">Додати користувача</h2>
+                    <div class="mb-3">
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="user-name"
+                            placeholder="Ім'я"
+                            required
+                            tabindex="5"
+                        >
+                        <span class="invalid-feedback"
+                            >Це поле є обов'язковим!</span
+                        >
+                        <span class="valid-feedback">👍</span>
+                    </div>
+                    <div class="mb-3">
+                        <input
+                            type="email"
+                            class="form-control"
+                            name="user-email"
+                            placeholder="Email"
+                            pattern=".+@\w+\.\w+"
+                            required
+                            tabindex="6"
+                        >
+                        <span class="invalid-feedback"
+                            >Це поле є обов'язковим</span
+                        >
+                        <span class="valid-feedback">👍</span>
+                    </div>
+                    <button
+                        class="btn btn-success mb-3"
+                        type="submit"
+                        tabindex="7"
+                    >
+                        Додати користувача
+                    </button>
+                </form>
+            </div>
+            <div class="container bg-white shadow p-3 rounded mb-4">
+                <h2 class="fw-bold my-3">Список книг</h2>
+                <div id="book-list" class="mb-3 d-flex flex-column"></div>
+            </div>
+            <div class="container bg-white shadow p-3 rounded mb-4">
+                <h2 class="fw-bold my-3">Список користувачів</h2>
+                <div id="user-list" class="mb-3 d-flex flex-column"></div>
+            </div>
+        </div>
+        <div class="modal fade" aria-hidden="true" tab-index="-1"></div>
+        <script src="bundle.js"></script>
+    </body>
+</html>

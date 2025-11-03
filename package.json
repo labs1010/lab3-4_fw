@@ -1,0 +1,21 @@
+{
+  "name": "lab3-library-app",
+  "version": "1.0.0",
+  "description": "Library management system using TypeScript, Bootstrap and Webpack",
+  "private": true,
+  "scripts": {
+    "start": "webpack serve --open --port 9000",
+    "build": "webpack --mode production",
+    "deploy": "gh-pages -d dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "ts-loader": "^9.5.1",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.1.0",
+    "style-loader": "^4.0.0",
+    "css-loader": "^7.1.2",
+    "gh-pages": "^6.1.1"
+  }
+}
