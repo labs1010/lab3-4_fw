@@ -7,168 +7,160 @@ import { Validation } from "./validation";
 // etc.
 
 class App {
-    private _validation: Validation;
-    private _service: LibraryService;
-    private _modal: Modal;
+  private _validation: Validation;
+  private _service: LibraryService;
+  private _modal: Modal;
 
-    constructor() {
-        localStorage.clear();
-        this._validation = Validation.getInstance();
-        this._service = LibraryService.getInstance();
-        this._modal = Modal.getInstance();
+  constructor() {
+    localStorage.clear();
+    this._validation = Validation.getInstance();
+    this._service = LibraryService.getInstance();
+    this._modal = Modal.getInstance();
+    this.updateUI();
+
+    const addBookForm = document.forms.namedItem("add-book") as HTMLFormElement;
+    const addUserForm = document.forms.namedItem("add-user") as HTMLFormElement;
+
+    addBookForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      if (this._validation.validateForm(addBookForm)) {
+        const id = Date.now();
+        const name = addBookForm["book-name"].value;
+        const author = addBookForm["book-author"].value;
+        const releaseYear = parseInt(addBookForm["release-year"].value);
+
+        const book = new Book(id, name, author, releaseYear);
+        this._service.addBook(book);
+
+        addBookForm.reset();
+        addBookForm.classList.remove("was-validated");
         this.updateUI();
+      }
+    });
 
-        const addBookForm = document.forms.namedItem(
-            "add-book",
-        ) as HTMLFormElement;
-        const addUserForm = document.forms.namedItem(
-            "add-user",
-        ) as HTMLFormElement;
+    addUserForm.addEventListener("submit", (e) => {
+      e.preventDefault();
 
-        addBookForm.addEventListener("submit", (e) => {
-            e.preventDefault();
+      if (this._validation.validateForm(addUserForm)) {
+        const name = addUserForm["user-name"].value;
+        const email = addUserForm["user-email"].value;
+        const id = Date.now(); // Generate a unique ID based on timestamp
 
-            if (this._validation.validateForm(addBookForm)) {
-                const id = Date.now();
-                const name = addBookForm["book-name"].value;
-                const author = addBookForm["book-author"].value;
-                const releaseYear = parseInt(addBookForm["release-year"].value);
+        const user = new User(id, name, email);
+        this._service.addUser(user);
 
-                const book = new Book(id, name, author, releaseYear);
-                this._service.addBook(book);
+        addUserForm.reset();
+        addUserForm.classList.remove("was-validated");
+        this.updateUI();
+      }
+    });
+  }
 
-                addBookForm.reset();
-                addBookForm.classList.remove("was-validated");
-                this.updateUI();
-            }
-        });
+  updateUI(): void {
+    const returnBook = (book: Book) => {
+      const user = this._service
+        .getUsers()
+        .find((u) => u.getId === book.getBorrower) as User;
+      Object.setPrototypeOf(book, Book.prototype);
+      Object.setPrototypeOf(user, User.prototype);
+      if (user && user.returnBook() && book.isBorrowed()) {
+        book.return();
 
-        addUserForm.addEventListener("submit", (e) => {
-            e.preventDefault();
+        this._service.updateBook(book.getId, book);
+        this._service.updateUser(user.getId, user);
 
-            if (this._validation.validateForm(addUserForm)) {
-                const name = addUserForm["user-name"].value;
-                const email = addUserForm["user-email"].value;
-                const id = Date.now(); // Generate a unique ID based on timestamp
+        this._modal.show(
+          `${book.getName} by ${book.getAuthor} (${book.getReleaseYear}) успішно повернена користувачем ${user.getId} ${user.getName} (${user.getEmail}).`,
+        );
+        this.updateUI();
+      } else {
+        this._modal.show(`Не вдалося повернути книгу.`);
+      }
+    };
 
-                const user = new User(id, name, email);
-                this._service.addUser(user);
+    const borrowBook = (book: Book) => {
+      this._modal.askId();
 
-                addUserForm.reset();
-                addUserForm.classList.remove("was-validated");
-                this.updateUI();
-            }
-        });
-    }
+      const handleSubmit = (e: Event) => {
+        e.preventDefault();
+        console.log("e");
 
-    updateUI(): void {
-        const returnBook = (book: Book) => {
-            const user = this._service
-                .getUsers()
-                .find((u) => u.getId === book.getBorrower) as User;
+        const form = e.target as HTMLFormElement;
+        if (this._validation.validateForm(form)) {
+          const userId = parseInt((form[0] as HTMLInputElement).value);
+          const user = this._service.findUser(userId);
+          if (user) {
             Object.setPrototypeOf(book, Book.prototype);
             Object.setPrototypeOf(user, User.prototype);
-            if (user && user.returnBook() && book.isBorrowed()) {
-                book.return();
 
-                this._service.updateBook(book.getId, book);
-                this._service.updateUser(user.getId, user);
-
-                this._modal.show(
-                    `${book.getName} by ${book.getAuthor} (${book.getReleaseYear}) успішно повернена користувачем ${user.getId} ${user.getName} (${user.getEmail}).`,
-                );
-                this.updateUI();
+            if (user && user.borrowBook(book)) {
+              console.log("e");
+              this._service.updateBook(book.getId, book);
+              this._service.updateUser(user.getId, user);
+              this._modal.show(
+                `${book.getName} by ${book.getAuthor} (${book.getReleaseYear}) успішно позичена користувачем ${user.getId} ${user.getName} (${user.getEmail}).`,
+              );
+              this.updateUI();
             } else {
-                this._modal.show(`Не вдалося повернути книгу.`);
+              console.log("e");
+              this._modal.show(
+                `Не вдалося позичити книгу. Можливо, користувач досяг ліміту позичених книг або книга вже позичена.`,
+              );
             }
-        };
+          } else {
+            this._modal.show("Не вдалося знайти користувача");
+          }
+        }
+      };
 
-        const borrowBook = (book: Book) => {
-            this._modal.askId();
+      const form = document.getElementById("borrow-form");
+      form?.addEventListener("submit", handleSubmit);
+    };
 
-            const handleSubmit = (e: Event) => {
-                e.preventDefault();
-                console.log("e");
+    // update the user interface here
+    const bookList = document.getElementById("book-list") as Element;
+    bookList.innerHTML = "";
+    this._service.getBooks().forEach((book) => {
+      Object.setPrototypeOf(book, Book.prototype);
+      const bookItem = document.createElement("div");
+      bookItem.className =
+        "d-flex justify-content-between align-items-center border-bottom py-3";
 
-                const form = e.target as HTMLFormElement;
-                if (this._validation.validateForm(form)) {
-                    const userId = parseInt(
-                        (form[0] as HTMLInputElement).value,
-                    );
-                    const user = this._service.findUser(userId);
-                    if (user) {
-                        Object.setPrototypeOf(book, Book.prototype);
-                        Object.setPrototypeOf(user, User.prototype);
+      const bookInfo = document.createElement("span");
+      bookInfo.textContent = `${book.getName} by ${book.getAuthor} (${book.getReleaseYear})`;
 
-                        if (user && user.borrowBook(book)) {
-                            console.log("e");
-                            this._service.updateBook(book.getId, book);
-                            this._service.updateUser(user.getId, user);
-                            this._modal.show(
-                                `${book.getName} by ${book.getAuthor} (${book.getReleaseYear}) успішно позичена користувачем ${user.getId} ${user.getName} (${user.getEmail}).`,
-                            );
-                            this.updateUI();
-                        } else {
-                            console.log("e");
-                            this._modal.show(
-                                `Не вдалося позичити книгу. Можливо, користувач досяг ліміту позичених книг або книга вже позичена.`,
-                            );
-                        }
-                    } else {
-                        this._modal.show("Не вдалося знайти користувача");
-                    }
-                }
-            };
+      const actionButton = document.createElement("button");
+      actionButton.className = book.isBorrowed()
+        ? "btn btn-warning"
+        : "btn btn-primary";
+      actionButton.type = "button";
+      actionButton.textContent = book.isBorrowed() ? "Повернути" : "Позичити";
 
-            const form = document.getElementById("borrow-form");
-            form?.addEventListener("submit", handleSubmit);
-        };
+      if (book.isBorrowed()) {
+        actionButton.addEventListener("click", () => returnBook(book));
+      } else {
+        actionButton.addEventListener("click", () => borrowBook(book));
+      }
 
-        // update the user interface here
-        const bookList = document.getElementById("book-list") as Element;
-        bookList.innerHTML = "";
-        this._service.getBooks().forEach((book) => {
-            Object.setPrototypeOf(book, Book.prototype);
-            const bookItem = document.createElement("div");
-            bookItem.className =
-                "d-flex justify-content-between align-items-center border-bottom py-3";
+      bookItem.appendChild(bookInfo);
+      bookItem.appendChild(actionButton);
+      bookList.appendChild(bookItem);
+    });
 
-            const bookInfo = document.createElement("span");
-            bookInfo.textContent = `${book.getName} by ${book.getAuthor} (${book.getReleaseYear})`;
-
-            const actionButton = document.createElement("button");
-            actionButton.className = book.isBorrowed()
-                ? "btn btn-warning"
-                : "btn btn-primary";
-            actionButton.type = "button";
-            actionButton.textContent = book.isBorrowed()
-                ? "Повернути"
-                : "Позичити";
-
-            if (book.isBorrowed()) {
-                actionButton.addEventListener("click", () => returnBook(book));
-            } else {
-                actionButton.addEventListener("click", () => borrowBook(book));
-            }
-
-            bookItem.appendChild(bookInfo);
-            bookItem.appendChild(actionButton);
-            bookList.appendChild(bookItem);
-        });
-
-        const userList = document.getElementById("user-list") as Element;
-        userList.innerHTML = "";
-        this._service.getUsers().forEach((user) => {
-            Object.setPrototypeOf(user, User.prototype);
-            userList.innerHTML += `
+    const userList = document.getElementById("user-list") as Element;
+    userList.innerHTML = "";
+    this._service.getUsers().forEach((user) => {
+      Object.setPrototypeOf(user, User.prototype);
+      userList.innerHTML += `
                 <div class="d-flex align-items-center py-3 border-bottom">
                     <span>${user.getId} ${user.getName} (${user.getEmail})</span>
                 </div>
             `;
-        });
-    }
+    });
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    new App();
+  new App();
 });
