@@ -9,7 +9,7 @@ module.exports = {
   output: {
     filename: "bundle.js",
     path: path.resolve(__dirname, "dist"),
-    clean: true
+    clean: true,
   },
 
   devtool: "source-map",
@@ -19,27 +19,27 @@ module.exports = {
       {
         test: /\.ts$/,
         use: "ts-loader",
-        exclude: /node_modules/
+        exclude: /node_modules/,
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"]
-      }
-    ]
+        use: ["style-loader", "css-loader"],
+      },
+    ],
   },
 
   resolve: {
-    extensions: [".ts", ".js"]
+    extensions: [".ts", ".js"],
   },
 
   devServer: {
     static: {
-      directory: path.join(__dirname)
+      directory: path.join(__dirname),
     },
     port: 9000,
     open: true,
     compress: true,
     hot: false,
-    historyApiFallback: true
-  }
+    historyApiFallback: true,
+  },
 };
