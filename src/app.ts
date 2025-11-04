@@ -12,7 +12,7 @@ class App {
     private _modal: Modal;
 
     constructor() {
-        localStorage.clear();
+        //localStorage.clear();
         this._validation = Validation.getInstance();
         this._service = LibraryService.getInstance();
         this._modal = Modal.getInstance();
